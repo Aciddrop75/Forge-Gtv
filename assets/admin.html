@@ -1,0 +1,671 @@
+<!doctype html>
+<!-- The Forge GTV - Copyright (C) 2026 [TFG]Aciddrop | SPDX-License-Identifier: GPL-3.0-or-later | This program comes with ABSOLUTELY NO WARRANTY; see the LICENSE file. -->
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Forge GTV · Admin</title>
+<style>
+:root{--bg:#0e0f13;--panel:#171922;--panel2:#1e2130;--line:#2a2e40;--text:#e6e8ef;--dim:#9aa0b4;--acc:#5865f2;--ok:#2ecc71;--warn:#f1c40f;--bad:#e74c3c}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,Segoe UI,sans-serif}
+a{color:#8ea1ff}header{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
+header h1{font-size:16px;margin:0}header .sp{flex:1}.pill{padding:2px 10px;border-radius:99px;font-size:12px;background:var(--panel2);border:1px solid var(--line)}
+.pill.ok{border-color:var(--ok);color:var(--ok)}.pill.bad{border-color:var(--bad);color:var(--bad)}.pill.warn{border-color:var(--warn);color:var(--warn)}
+nav{display:flex;gap:4px;padding:10px 20px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav button{background:none;border:0;color:var(--dim);padding:8px 14px;border-bottom:2px solid transparent;cursor:pointer;font-size:14px}
+nav button.on{color:var(--text);border-color:var(--acc)}main{max-width:1100px;margin:0 auto;padding:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.card h2{margin:0 0 10px;font-size:15px}.card h3{margin:14px 0 6px;font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>.f{flex:1;min-width:180px}.f{margin-bottom:10px}.f label{display:block;color:var(--dim);font-size:12px;margin-bottom:3px}
+input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:6px;padding:7px 9px;font:inherit}
+input[type=checkbox]{width:auto;margin-right:6px}textarea{min-height:120px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+button.b{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:7px 14px;cursor:pointer;font:inherit}
+button.b.sec{background:var(--panel2);border:1px solid var(--line);color:var(--text)}button.b.red{background:var(--bad)}button.b:disabled{opacity:.5;cursor:default}
+.hint{color:var(--dim);font-size:12px;margin-top:3px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--dim);font-weight:500;font-size:12px}.check{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.check b{min-width:130px}.check .st{min-width:70px;font-weight:600}.st.ok{color:var(--ok)}.st.info{color:var(--dim)}.st.problem{color:var(--bad)}
+.check pre{margin:2px 0;white-space:pre-wrap;font-size:12px;color:var(--dim)}.fix{color:var(--warn);font-size:12px}
+.steps{list-style:none;padding:0;margin:0}.steps li{display:flex;gap:10px;align-items:center;padding:7px 0}.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none}
+.dot.done{background:var(--ok);border-color:var(--ok)}pre.log{background:#0a0b0f;border:1px solid var(--line);border-radius:8px;padding:10px;max-height:60vh;overflow:auto;font-size:12px;white-space:pre-wrap}
+.login{max-width:380px;margin:12vh auto}.toast{position:fixed;right:18px;bottom:18px;background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:8px;max-width:420px;z-index:9}
+.toast.bad{border-color:var(--bad)}.toast.ok{border-color:var(--ok)}.muted{color:var(--dim)}.mono{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}details{margin:8px 0}summary{cursor:pointer;color:var(--dim)}
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(720px,100%);max-height:88vh;display:flex;flex-direction:column;padding:14px}
+.modal h2{margin:0 0 8px;font-size:15px}.flist{overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel2);min-height:200px;flex:1}
+.frow{display:flex;gap:10px;padding:6px 10px;cursor:pointer;border-bottom:1px solid var(--line);align-items:center}.frow:hover{background:#262a3d}
+.frow.sel{background:#2b3160;outline:1px solid var(--acc)}.frow.dim{opacity:.45;cursor:default}.frow .n{flex:1;word-break:break-all}.frow .sz{color:var(--dim);font-size:12px}
+.pick{display:flex;gap:8px}.pick input{flex:1}.pick button{flex:none}
+.embedprev{background:#2b2d31;border-left:4px solid var(--acc);border-radius:4px;padding:10px 12px;max-width:460px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;color:#dbdee1}
+.embedprev .au{grid-column:1;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600}.embedprev .au img{width:20px;height:20px;border-radius:50%;object-fit:cover}
+.embedprev .th{grid-column:2;grid-row:1/4}.embedprev .th img{width:64px;height:64px;border-radius:4px;object-fit:cover;display:block}
+.embedprev .ti{grid-column:1;font-weight:700;font-size:15px}.embedprev .ds{grid-column:1;font-size:13px;color:#b5bac1}
+.embedprev .ft{grid-column:1/3;font-size:11px;color:#949ba4;margin-top:4px}
+.picrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.picrow img{max-height:56px;max-width:140px;border-radius:6px;background:#0a0b0f;border:1px solid var(--line)}
+.warnbox{border:1px solid var(--warn);background:rgba(241,196,15,.08);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px}
+</style></head><body>
+<div id="app"></div><div id="toast"></div>
+<script>
+"use strict";
+const $ = (s, r) => (r || document).querySelector(s);
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, ""); else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+}
+let S = { tab: "dashboard", hello: null, state: null, config: null, authed: false, logsTimer: null };
+async function api(method, path, body) {
+  const r = await fetch(path, { method, headers: { "Content-Type": "application/json", "X-Requested-With": "gtv-admin" }, body: body === undefined ? undefined : JSON.stringify(body), credentials: "same-origin" });
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (r.status === 401 && path !== "/api/login") { S.authed = false; render(); }
+  if (!r.ok || j.ok === false) { const err = new Error(j.error || ("HTTP " + r.status)); err.data = j; throw err; }
+  return j;
+}
+function toast(msg, kind) { const t = h("div", { class: "toast " + (kind || "") }, msg); $("#toast").append(t); setTimeout(() => t.remove(), kind === "bad" ? 9000 : 4000); }
+async function act(btn, fn) { if (btn) btn.disabled = true; try { return await fn(); } catch (e) { toast(e.message, "bad"); } finally { if (btn) btn.disabled = false; } }
+async function refresh() { try { S.state = await api("GET", "/api/state"); S.config = (await api("GET", "/api/config")).config; } catch (e) {} }
+const field = (label, input, hint) => h("div", { class: "f" }, h("label", {}, label), input, hint ? h("div", { class: "hint" }, hint) : null);
+const text = (v, o) => h("input", Object.assign({ type: "text", value: v == null ? "" : v }, o || {}));
+const num = (v, o) => h("input", Object.assign({ type: "number", value: v }, o || {}));
+const check = (v, label) => h("label", { style: "display:flex;align-items:center;color:var(--text);font-size:14px" }, h("input", { type: "checkbox", checked: !!v }), label);
+
+function renderChecks(box, res) {
+  box.replaceChildren(...res.checks.map(c => h("div", { class: "check" }, h("b", {}, c.label), h("span", { class: "st " + c.status }, c.status === "problem" ? "PROBLEM" : c.status === "ok" ? "ok" : "info"),
+    h("div", {}, h("pre", {}, c.msg), c.fix ? h("div", { class: "fix" }, "→ " + c.fix) : null))));
+  box.prepend(h("div", { class: "pill " + (res.problems ? "bad" : "ok"), style: "display:inline-block;margin-bottom:8px" }, res.problems ? res.problems + " problem(s)" : "all good"));
+}
+
+// ---------------------------------------------------------------- shell
+async function boot() {
+  try { S.hello = await api("GET", "/api/hello"); } catch (e) { S.hello = { configured: true }; }
+  try { await refresh(); S.authed = !!S.state; } catch (e) {}
+  render();
+  setInterval(async () => { if (S.authed) { try { S.state = await api("GET", "/api/state"); renderHeader(); if (S.tab === "dashboard") renderTab(); } catch (e) {} } }, 5000);
+}
+function render() {
+  const root = $("#app"); root.replaceChildren();
+  if (!S.authed) return root.append(loginView());
+  root.append(h("header", { id: "hd" }), h("nav", { id: "nav" }), h("main", { id: "main" }));
+  renderHeader(); renderNav(); renderTab();
+}
+function renderHeader() {
+  const hd = $("#hd"); if (!hd || !S.state) return;
+  const d = S.state.runtime.discord, ds = d.state;
+  hd.replaceChildren(...[h("h1", {}, "The Forge GTV · Admin"), h("span", { class: "muted" }, "v" + S.state.version + " · " + S.state.owner),
+    h("span", { class: "sp" }),
+    S.state.runtime.needs_restart ? h("span", { class: "pill warn" }, "restart needed") : null,
+    h("span", { class: "pill " + (ds === "Ready" && !S.state.runtime.discord_note ? "ok" : ds === "Failed" ? "bad" : "warn"), title: ds === "Failed" ? d.detail : (S.state.runtime.discord_note || "") }, "Discord: " + (ds === "Ready" ? d.detail : ds === "NoToken" ? "no token" : ds === "Failed" ? "failed" : ds.toLowerCase())),
+    h("button", { class: "b sec", onclick: async () => { await api("POST", "/api/logout"); S.authed = false; render(); } }, "Sign out")].filter(Boolean));
+}
+function renderNav() {
+  const tabs = [["dashboard", "Dashboard"], ["setup", "Setup"], ["servers", "Servers"], ["video", "Video"], ["branding", "Branding"], ["settings", "Settings"], ["logs", "Logs"]];
+  $("#nav").replaceChildren(...tabs.map(([id, t]) => h("button", { class: S.tab === id ? "on" : "", onclick: () => { S.tab = id; renderNav(); renderTab(); } }, t)));
+}
+function renderTab() {
+  clearInterval(S.logsTimer);
+  const m = $("#main"); if (!m) return; m.replaceChildren();
+  ({ dashboard: viewDashboard, setup: viewSetup, servers: viewServers, video: viewVideo, branding: viewBranding, settings: viewSettings, logs: viewLogs })[S.tab](m);
+}
+function loginView() {
+  const first = S.hello && !S.hello.configured;
+  const pw = h("input", { type: "password", placeholder: first ? "Choose a password (8+ characters)" : "Admin password", autofocus: true });
+  const go = async (btn) => act(btn, async () => { await api("POST", first ? "/api/setup" : "/api/login", { password: pw.value }); await refresh(); S.authed = true; render(); });
+  pw.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  return h("div", { class: "login card" }, h("h2", {}, first ? "Welcome — set an admin password" : "The Forge GTV · Admin"),
+    first ? h("p", { class: "muted" }, "This is the first start. Choose a password for this panel. You can only do this from the computer the bot runs on.") : null,
+    field(first ? "New password" : "Password", pw), h("button", { class: "b", onclick: e => go(e.target) }, first ? "Set password" : "Sign in"),
+    h("div", { class: "hint", style: "margin-top:12px" }, "The Forge GTV v" + (S.hello ? S.hello.version : "") + " · owner " + (S.hello ? S.hello.owner : "")),
+    h("div", { class: "hint" }, "Free software under the GNU GPL v3 or later · no warranty · not affiliated with Frozen Sand, Urban Terror or Discord Inc."));
+}
+
+// ---------------------------------------------------------------- dashboard
+/** Why Discord is not (fully) working, in words: the failure the bot got, or a note about a feature that had to be switched off. */
+function discordBanner() {
+  const d = S.state.runtime.discord, note = S.state.runtime.discord_note;
+  const kids = [];
+  if (d.state === "Failed") kids.push(h("div", { class: "fix" }, "✘ Discord: " + d.detail), h("div", { class: "muted" }, "Fix it, then press “Reconnect to Discord” on the Setup tab."));
+  if (note) kids.push(h("div", { class: "warnbox" }, note));
+  return kids.length ? h("div", { class: "card" }, ...kids) : null;
+}
+function viewDashboard(m) {
+  const st = S.state, rt = st.runtime;
+  const db = discordBanner(); if (db) m.append(db);
+  m.append(h("div", { class: "card" }, h("h2", {}, "Getting started"), h("ul", { class: "steps" }, ...st.checklist.map(c =>
+    h("li", {}, h("span", { class: "dot " + (c.done ? "done" : "") }), c.title, c.manual ? h("span", { class: "muted" }, " (use the link on the Setup tab)") : null)))));
+  if (st.problems.length) m.append(h("div", { class: "card" }, h("h2", {}, "Configuration problems"), h("ul", {}, ...st.problems.map(p => h("li", {}, p)))));
+  m.append(h("div", { class: "card" }, h("h2", {}, "Running broadcasts" + (rt.watches.length > 1 ? " (" + rt.watches.length + ")" : "")), rt.watches.length ? h("table", {}, h("tr", {}, h("th", {}, "Channel"), h("th", {}, "Server"), h("th", {}, "Delay"), h("th", {}, "Video"), h("th", {}, "Player port"), h("th", {}, "Watching"), h("th", {})),
+    ...rt.watches.map(w => h("tr", {}, h("td", { class: "mono" }, w.channel_id), h("td", {}, w.server), h("td", {}, w.delay + "s"), h("td", {}, w.video ? "on" : "off"), h("td", { class: "mono" }, w.video ? (w.web_port ? String(w.web_port) : "shared") : "–"), h("td", {}, w.video ? "👁 " + w.viewers + (w.viewers_open > w.viewers ? " (+" + (w.viewers_open - w.viewers) + " waiting)" : "") : "–"),
+      h("td", {}, h("button", { class: "b red", onclick: e => act(e.target, async () => { await api("POST", "/api/broadcast/stop", { channel_id: w.channel_id, server: w.server }); toast("Stopped", "ok"); await refresh(); renderTab(); }) }, "Stop"))))) :
+    h("p", { class: "muted" }, "Nothing is broadcasting. Start one from Discord with /gtv start, or below. Any number of servers can broadcast at the same time — even in the same channel.")));
+  m.append(startCard());
+  m.append(h("div", { class: "card" }, h("h2", {}, "Servers"), st.servers.length ? h("table", {}, h("tr", {}, h("th", {}, "Key"), h("th", {}, "Name"), h("th", {}, "Address"), h("th", {}, "Live feed"), h("th", {}, "Video"), h("th", {}, "Player port"), h("th", {})),
+    ...st.servers.map(s => { const out = h("div"); return h("tr", {}, h("td", { class: "mono" }, s.key), h("td", {}, s.name), h("td", { class: "mono" }, s.host + ":" + s.port), h("td", {}, s.log ? "games.log" : "scoreboard only"), h("td", {}, s.video ? "yes" : "no"), h("td", { class: "mono" }, s.video ? (s.web_port ? String(s.web_port) : "shared") : "–"),
+      h("td", {}, h("button", { class: "b sec", onclick: e => act(e.target, async () => { const r = await api("POST", "/api/servers/" + s.key + "/test", {}); const box = h("div"); renderChecks(box, r); e.target.closest("td").append(box); }) }, "Test connection"))); })) :
+    h("p", { class: "muted" }, "No servers yet — add one on the Servers tab.")));
+}
+function startCard() {
+  const cfg = S.config, keys = Object.keys(cfg.servers);
+  if (!keys.length) return h("div");
+  const sel = h("select", {}, ...keys.map(k => h("option", { value: k }, k + " — " + (cfg.servers[k].name || k))));
+  const ch = text("", { placeholder: "e.g. 123456789012345678" }), delay = num(0, { min: 0, max: 180 }), vid = h("input", { type: "checkbox" });
+  return h("div", { class: "card" }, h("h2", {}, "Start a broadcast from here"),
+    h("div", { class: "row" }, field("Server", sel), field("Discord channel ID", ch, "Right-click the channel → Copy Channel ID (Developer Mode must be on)"), field("Delay (s)", delay)),
+    h("label", { style: "display:flex;align-items:center;margin-bottom:10px" }, vid, "Also start the spectator video"),
+    h("div", { class: "hint" }, "Starting another server does not stop the ones already running — use a different channel, or the same one (each server gets its own scoreboard and feed)."),
+    h("button", { class: "b", onclick: e => act(e.target, async () => { const r = await api("POST", "/api/broadcast/start", { channel_id: ch.value, server: sel.value, delay: +delay.value, stream: vid.checked }); toast(r.message, "ok"); await refresh(); renderTab(); }) }, "Start"));
+}
+
+// ---------------------------------------------------------------- setup wizard
+function viewSetup(m) {
+  const cfg = S.config;
+  const sb = discordBanner(); if (sb) m.append(sb);
+  const tok = text("", { type: "password", placeholder: cfg.discord.token ? "(saved — leave as is to keep)" : "Paste the bot token", autocomplete: "off" });
+  if (cfg.discord.token) tok.value = cfg.discord.token;
+  const info = h("div", { class: "hint" });
+  const verify = async (btn) => act(btn, async () => {
+    const r = await api("POST", "/api/discord/info", { token: tok.value });
+    info.replaceChildren(r.valid ? h("span", {}, "✔ Token belongs to ", h("b", {}, r.name), " — ", h("a", { href: r.invite_url, target: "_blank", rel: "noopener" }, "Invite it to your Discord server")) : h("span", { class: "fix" }, "✘ " + r.error));
+    return r;
+  });
+  m.append(h("div", { class: "card" }, h("h2", {}, "1 · Discord bot"),
+    h("p", { class: "muted" }, "Create the bot at ", h("a", { href: "https://discord.com/developers/applications", target: "_blank", rel: "noopener" }, "discord.com/developers/applications"), " → New Application → Bot → Reset Token, then paste the token here."),
+    field("Bot token", tok), info,
+    h("div", { class: "acts" },
+      h("button", { class: "b sec", onclick: e => verify(e.target) }, "Check token"),
+      h("button", { class: "b", onclick: e => act(e.target, async () => {
+        const r = await verify(); if (!r.valid) return;
+        const c = JSON.parse(JSON.stringify(S.config)); c.discord.token = tok.value;
+        await api("PUT", "/api/config", { config: c }); await api("POST", "/api/discord/reconnect"); toast("Saved — connecting to Discord…", "ok"); await refresh(); renderHeader();
+      }) }, "Save & connect"))));
+  m.append(h("div", { class: "card" }, h("h2", {}, "2 · Your game server"), h("p", { class: "muted" }, Object.keys(cfg.servers).length ? "You have " + Object.keys(cfg.servers).length + " server(s). Add more or edit them on the Servers tab." : "No server yet."),
+    h("button", { class: "b", onclick: () => { S.tab = "servers"; S.edit = { key: "", isNew: true }; renderNav(); renderTab(); } }, "Add a server")));
+  const pub = text(cfg.web ? cfg.web.public_url : "", { placeholder: "http://your-public-address:8080" });
+  m.append(h("div", { class: "card" }, h("h2", {}, "3 · Video player address (optional)"), h("p", { class: "muted" }, "Only needed for the spectator video. This is the address viewers open — it must be reachable from the internet (open the port on your firewall/router)."),
+    field("Public URL", pub), h("button", { class: "b", onclick: e => act(e.target, async () => {
+      const c = JSON.parse(JSON.stringify(S.config)); c.web = c.web || { host: "0.0.0.0", port: 8080, public_url: "", token: "" };
+      c.web.public_url = pub.value.trim(); if (!c.web.token || c.web.token === "") c.web.token = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, "0")).join("");
+      const r = await api("PUT", "/api/config", { config: c }); toast(r.needs_restart ? "Saved — restart the bot to open the web port" : "Saved", "ok"); await refresh(); renderHeader();
+    }) }, "Save")));
+  m.append(h("div", { class: "card" }, h("h2", {}, "4 · Use it in Discord"), h("p", {}, "In the channel where you want the live scoreboard, type ", h("code", {}, "/gtv start"), " and pick your server. Add ", h("code", {}, "stream:True"), " for video. Or start one from the Dashboard.")));
+}
+
+// ---------------------------------------------------------------- servers
+function viewServers(m) {
+  const cfg = S.config;
+  if (S.edit) return m.append(serverForm(S.edit));
+  m.append(h("div", { class: "card" }, h("div", { class: "acts", style: "justify-content:space-between;margin-bottom:8px" }, h("h2", {}, "Game servers"),
+    h("button", { class: "b", onclick: () => { S.edit = { key: "", isNew: true }; renderTab(); } }, "+ Add server")),
+    Object.keys(cfg.servers).length ? h("table", {}, h("tr", {}, h("th", {}, "Key"), h("th", {}, "Name"), h("th", {}, "Address"), h("th", {}, "games.log"), h("th", {})),
+      ...Object.entries(cfg.servers).map(([k, s]) => h("tr", {}, h("td", { class: "mono" }, k), h("td", {}, s.name || k), h("td", { class: "mono" }, s.host + ":" + s.port), h("td", { class: "mono" }, s.log_path || "—"),
+        h("td", { class: "acts" }, h("button", { class: "b sec", onclick: () => { S.edit = { key: k, isNew: false }; renderTab(); } }, "Edit"),
+          h("button", { class: "b red", onclick: e => { if (confirm("Remove server '" + k + "'?")) act(e.target, async () => { await api("DELETE", "/api/servers/" + k); await refresh(); toast("Removed", "ok"); renderTab(); }); } }, "Remove"))))) :
+      h("p", { class: "muted" }, "No servers yet. You can watch several game servers with one bot — add each one here.")));
+  m.append(sftpCard());
+}
+function sshFields(init) {
+  const f = { name: text(init.name || "", { placeholder: "e.g. gameserver" }), host: text(init.host || ""), port: num(init.port || 22), user: text(init.user || ""),
+    password: text("", { type: "password", placeholder: "or use a key file" }), key_file: text(init.key_file || "", { placeholder: "~/.ssh/id_ed25519" }) };
+  const box = h("div", {}, h("div", { class: "row" }, field("Connection name", f.name, "A label for this login, e.g. gameserver"), field("Host", f.host), field("Port", f.port), field("User", f.user)),
+    h("div", { class: "row" }, field("Password", f.password), field("or private key file (on this machine)", f.key_file)));
+  const body = () => ({ type: "sftp", host: f.host.value.trim(), port: +f.port.value, user: f.user.value.trim(), password: f.password.value, key_file: f.key_file.value.trim(), known_hosts: "", password_env: "", trust_unknown_hosts: false });
+  return { box, f, body };
+}
+// Run the SSH/SFTP test and draw the answer (with the host-key approval step) into `out`.
+async function runSshTest(out, payload) {
+  const r = await api("POST", "/api/test/filesystem", payload);
+  const parts = [];
+  if (r.connected) {
+    parts.push(h("div", { class: "pill ok" }, "✔ SSH login works — " + r.label));
+    if (r.file_ok === true) parts.push(h("div", { class: "pill ok", style: "margin-top:6px" }, "✔ " + r.file_detail));
+    if (r.file_ok === false) parts.push(h("div", { class: "fix", style: "margin-top:6px" }, "✘ " + r.file_error));
+  } else {
+    parts.push(h("div", { class: "fix" }, "✘ " + r.error));
+    if (r.needs_host_key_approval) parts.push(h("button", { class: "b sec", onclick: e => { if (confirm("Only continue if the fingerprint above matches your game server.\nTrust this host key and remember it?")) act(e.target, () => runSshTest(out, Object.assign({}, payload, { learn_host_key: true }))); } }, "Trust this host key and retry"));
+  }
+  out.replaceChildren(...parts);
+  return r;
+}
+
+// ---- file picker: browse this computer (or an SSH login) instead of typing paths ----
+const sepOf = p => (p || "").includes("\\") && !(p || "").includes("/") ? "\\" : "/";
+const dirnameOf = p => { const m = /^(.*)[\\/][^\\/]*$/.exec((p || "").trim()); return m ? (m[1] || "/") : ""; };
+const fmtSize = n => n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : n >= 1024 ? Math.round(n / 1024) + " KB" : n + " B";
+const MATCH_LOG = { fn: e => /\.(log|txt)$/i.test(e.name), label: "Only .log / .txt files" };
+const PIC_RE = /\.(jpe?g|png|tga)$/i, PK3_RE = /\.pk3$/i;
+const picHint = entries => {
+  const pics = entries.filter(e => !e.dir && PIC_RE.test(e.name)).length, pk3 = entries.filter(e => !e.dir && PK3_RE.test(e.name)).length, sub = entries.some(e => e.dir && /^levelshots$/i.test(e.name));
+  if (!pics && !pk3 && !sub) return "No map pictures here (no .jpg/.png/.tga files, no .pk3 archives, no levelshots folder). Look for the folder named q3ut4 or one with .pk3 files.";
+  return "✔ This folder looks right: " + [pk3 ? pk3 + " .pk3 archive" + (pk3 > 1 ? "s" : "") : "", pics ? pics + " picture file" + (pics > 1 ? "s" : "") : "", sub ? "a levelshots folder" : ""].filter(Boolean).join(", ") + ".";
+};
+const MATCH_EXE = { fn: e => e.exec || /\.exe$/i.test(e.name) || /(quake3|ioq3|urt|ioUrT)/i.test(e.name), label: "Only programs" };
+function withBrowse(input, onBrowse, label) {
+  return h("div", { class: "pick" }, input, h("button", { class: "b sec", type: "button", onclick: onBrowse }, label || "Browse…"));
+}
+/** o: { title, kind: "file"|"dir", source: () => request fields, start, match?: {fn,label}, hint?: entries => text, onPick(path) } */
+function browseDialog(o) {
+  const back = h("div", { class: "modal-back" }), box = h("div", { class: "modal" });
+  const pathIn = text(""), list = h("div", { class: "flist" }), msg = h("div", { style: "min-height:20px;margin:6px 0" });
+  const onlyBox = o.match ? check(true, o.match.label) : null, filt = text("", { placeholder: "filter by name…" });
+  const hintBox = h("div", { class: "muted", style: "margin:6px 0;min-height:18px" });
+  const chosen = h("span", { class: "mono muted" }), useBtn = h("button", { class: "b", disabled: true }, o.kind === "dir" ? "Use this folder" : "Choose this file");
+  const upBtn = h("button", { class: "b sec", type: "button" }, "⬆ Up"), homeBtn = h("button", { class: "b sec", type: "button" }, "🏠 Home");
+  let cur = null, data = null, sel = null, learn = false;
+  const close = () => { back.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = ev => { if (ev.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  back.addEventListener("mousedown", ev => { if (ev.target === back) close(); });
+  const join = (dir, name) => dir === "This PC" || /^[A-Za-z]:\\$/.test(name) ? name : dir.replace(/[\\/]+$/, "") + sepOf(dir) + name;
+  const setSel = p => { sel = p; chosen.textContent = p || ""; useBtn.disabled = o.kind === "dir" ? !cur || cur === "This PC" : !p; };
+  const draw = () => {
+    if (!data) return;
+    if (o.hint) hintBox.textContent = o.hint(data.entries);
+    const q = filt.value.trim().toLowerCase(), only = onlyBox && onlyBox.querySelector("input").checked;
+    let shown = data.entries.filter(e => (!q || e.name.toLowerCase().includes(q)) && (e.dir || !only || o.match.fn(e)));
+    const files = data.entries.filter(e => !e.dir).length;
+    list.replaceChildren(...[...shown.map(e => {
+      const full = join(data.path, e.name), dim = o.kind === "dir" && !e.dir;
+      const row = h("div", { class: "frow" + (dim ? " dim" : "") + (sel === full ? " sel" : ""),
+        onclick: () => { if (e.dir) load(full); else if (!dim) { setSel(full); draw(); } },
+        ondblclick: () => { if (!e.dir && !dim) { o.onPick(full); close(); } } },
+        h("span", {}, e.dir ? "📁" : e.exec ? "⚙️" : "📄"), h("span", { class: "n" }, e.name), h("span", { class: "sz" }, e.dir ? "" : fmtSize(e.size)));
+      return row;
+    }), shown.length ? null : h("div", { class: "muted", style: "padding:14px" }, data.entries.length ? (only && files ? "Nothing here matches — untick “" + o.match.label + "” to see every file." : "Nothing matches the filter.") : "This folder is empty."),
+      data.truncated ? h("div", { class: "muted", style: "padding:8px" }, "Only the first entries are shown — use the filter box.") : null].filter(Boolean));
+  };
+  const load = async path => {
+    msg.replaceChildren(h("span", { class: "muted" }, "Loading…"));
+    let r;
+    try { r = await api("POST", "/api/browse", Object.assign({}, o.source(), { path, learn_host_key: learn || undefined })); }
+    catch (e) { msg.replaceChildren(h("div", { class: "fix" }, "✘ " + e.message)); return; }
+    if (!r.listed) {
+      const kids = [h("div", { class: "fix" }, "✘ " + r.error)];
+      if (r.suggest) kids.push(h("button", { class: "b sec", onclick: () => load(r.suggest) }, "Did you mean " + r.suggest + " ?"));
+      if (r.needs_host_key_approval) kids.push(h("button", { class: "b sec", onclick: () => { learn = true; load(path); } }, "Trust this server’s key and retry"));
+      msg.replaceChildren(...kids); return;
+    }
+    msg.replaceChildren(); data = r; cur = r.path; pathIn.value = r.path; filt.value = "";
+    upBtn.disabled = r.parent == null; setSel(o.kind === "dir" ? null : (sel && sel.startsWith(r.path) ? sel : null)); draw();
+  };
+  pathIn.addEventListener("keydown", ev => { if (ev.key === "Enter") load(pathIn.value.trim()); });
+  filt.addEventListener("input", draw); if (onlyBox) onlyBox.addEventListener("change", draw);
+  upBtn.addEventListener("click", () => data && data.parent != null && load(data.parent)); homeBtn.addEventListener("click", () => load(""));
+  useBtn.addEventListener("click", () => { const v = o.kind === "dir" ? cur : sel; if (v) { o.onPick(v); close(); } });
+  box.append(h("h2", {}, o.title), h("div", { class: "pick" }, upBtn, homeBtn, pathIn, h("button", { class: "b sec", type: "button", onclick: () => load(pathIn.value.trim()) }, "Go")),
+    h("div", { class: "row", style: "margin:8px 0;align-items:center" }, onlyBox, h("div", { class: "f", style: "margin:0;flex:1" }, filt)), msg, list, hintBox,
+    h("div", { class: "acts", style: "margin-top:10px;align-items:center" }, useBtn, h("button", { class: "b sec", onclick: close }, "Cancel"), chosen));
+  back.append(box); document.body.append(back); load(o.start || "");
+}
+/** The rcon switch only works together with the password: greyed out (and cleared) while that field is empty. */
+function tieRconSwitch(pw, sw) {
+  const cb = sw.querySelector("input"), sync = () => { const has = pw.value.trim() !== ""; cb.disabled = !has; if (!has) cb.checked = false; sw.style.opacity = has ? "1" : ".55"; };
+  pw.addEventListener("input", sync); sync();
+}
+function serverForm(ed) {
+  const s = ed.isNew ? { name: "", host: "", port: 27960, rcon_password: "", log_path: "", archive_dir: "", poll_interval: 2, relay_chat: false, show_joins: true, spectator: null } : JSON.parse(JSON.stringify(S.config.servers[ed.key]));
+  const fsNames = Object.keys(S.config.filesystems);
+  const key = text(ed.key, { disabled: !ed.isNew, placeholder: "e.g. ctf  (letters, digits, - _)" }), name = text(s.name), host = text(s.host, { placeholder: "IP or hostname of the game server" }), port = num(s.port, { min: 1, max: 65535 });
+  let mode = !s.log_path ? "none" : /^[A-Za-z][\w-]+:\//.test(s.log_path) ? "sftp" : "local";
+  let sfName = fsNames[0] || "", sfPath = "", localPath = "";
+  if (mode === "sftp") { const i = s.log_path.indexOf(":"); sfName = s.log_path.slice(0, i); sfPath = s.log_path.slice(i + 1); } else if (mode === "local") localPath = s.log_path;
+  const modeSel = h("select", {}, h("option", { value: "none" }, "None — scoreboard only"), h("option", { value: "local" }, "On this machine (a file path)"), h("option", { value: "sftp" }, "On another machine (over SFTP)"));
+  modeSel.value = mode;
+  const lp = text(localPath, { placeholder: "/home/urt/.q3a/q3ut4/games.log" });
+  const NEW = "__new";
+  const fsSel = h("select", {}, ...fsNames.map(n => h("option", { value: n }, n)), h("option", { value: NEW }, "+ New SSH connection…")); fsSel.value = fsNames.includes(sfName) ? sfName : (fsNames[0] || NEW);
+  const ssh = sshFields({}), logOut = h("div");
+  const rp = text(sfPath, { placeholder: "/home/urt/.q3a/q3ut4/games.log" });
+  const logBox = h("div");
+  const drawLog = () => {
+    if (modeSel.value === "local") return logBox.replaceChildren(field("Log file path", withBrowse(lp, () => browseDialog({ title: "Choose the game server’s log file (games.log)", kind: "file", source: () => ({ local: true }), start: dirnameOf(lp.value), match: MATCH_LOG, onPick: p => { lp.value = p; } })), "Pick the file instead of typing it. Any file name works, not just games.log. In server.cfg set: g_log games.log, g_logsync 2"));
+    if (modeSel.value !== "sftp") return logBox.replaceChildren();
+    logBox.replaceChildren(h("div", { class: "row" }, field("SSH connection", fsSel, fsNames.length ? "A saved login, or add a new one" : "No saved login yet — add one now"), field("Log file path on that machine", withBrowse(rp, () => browseDialog({ title: "Choose the log file on the remote machine", kind: "file", source: () => fsSel.value === NEW ? ssh.body() : { name: fsSel.value }, start: dirnameOf(rp.value), match: MATCH_LOG, onPick: p => { rp.value = p; } })), "Browse the remote machine, or type a path such as /home/urt/.q3a/q3ut4/games.log")),
+      fsSel.value === NEW ? ssh.box : null,
+      h("div", { class: "acts" }, h("button", { class: "b sec", onclick: e => act(e.target, async () => {
+        if (!rp.value.trim()) throw new Error("Enter the path of the log file first.");
+        const payload = fsSel.value === NEW ? Object.assign(ssh.body(), { file: rp.value.trim() }) : { name: fsSel.value, file: rp.value.trim() };
+        await runSshTest(logOut, payload);
+      }) }, "Test SSH login + log file")), logOut);
+  };
+  fsSel.addEventListener("change", drawLog);
+  modeSel.addEventListener("change", drawLog); drawLog();
+  const rcon = text(s.rcon_password, { type: "password" }), relay = check(s.relay_chat, "Relay Discord chat into the game (needs rcon password)"), rcmd = check(s.rcon_commands && !!s.rcon_password, "Let the Discord server-admin role run rcon commands here: cyclemap, slap, kick, bigtext, ban (needs the rcon password; the role is chosen in Settings)"), joins = check(s.show_joins, "Show joins/leaves in the feed");
+  tieRconSwitch(rcon, rcmd);
+  const lvdir = text(s.levelshot_dir || "", { placeholder: "optional — e.g. /home/urt/UrbanTerror43/q3ut4" }), arch = text(s.archive_dir, { placeholder: "optional — folder for match summaries (JSON)" }), poll = num(s.poll_interval, { min: 1, step: 0.5 });
+  const sp = s.spectator, wantVideo = check(!!sp, "Enable spectator video for this server");
+  const spd = Object.assign({ client_binary: "", base_path: "", output: "hls", rtmp_url: "", web_port: 0, public_url: "", width: 1280, height: 720, fps: 30, video_kbps: 3000, client_name: "^3GTV", audio: "silent", director: true, work_dir: "./stream", encoder: "cpu" }, sp || {});
+  const spBox = h("div"), spf = {};
+  const drawVideo = () => {
+    spBox.replaceChildren(); if (!wantVideo.querySelector("input").checked) return;
+    spf.client_binary = text(spd.client_binary, { placeholder: "/path/to/Quake3-UrT.x86_64 (or .exe)" }); spf.base_path = text(spd.base_path, { placeholder: "folder that contains q3ut4/" });
+    spf.output = h("select", {}, ...["hls", "rtmp", "both"].map(o => h("option", { value: o }, o))); spf.output.value = spd.output;
+    spf.rtmp_url = text(spd.rtmp_url, { type: "password", placeholder: "rtmp://… (only for rtmp/both)" });
+    spf.width = num(spd.width); spf.height = num(spd.height); spf.fps = num(spd.fps); spf.video_kbps = num(spd.video_kbps); spf.client_name = text(spd.client_name);
+    spf.director = check(spd.director, "Auto director (camera follows the action)");
+    spf.hide_chat = check(spd.hide_chat !== false, "Hide the in-game chat on the video (nothing typed in the game is shown to viewers)");
+    spf.web_port = num(spd.web_port || 0, { min: 0, max: 65535 }); spf.public_url = text(spd.public_url || "", { placeholder: "optional, e.g. https://gtv2.example.com" });
+    spf.escape_delay = num(spd.escape_delay == null ? 60 : spd.escape_delay, { min: 0, max: 600 });
+    spf.spectate_key = text(spd.spectate_key == null ? "Escape 4" : spd.spectate_key, { placeholder: "Escape 4" });
+    spf.force_spectator = check(spd.force_spectator !== false, "Always stay a spectator (never pick a team; moves itself out of a team if the server puts it in one)");
+    const isWin = S.state && S.state.os === "windows";
+    const encOpts = [["cpu", "CPU — works everywhere (x264)"], ["auto", "GPU — automatic: best GPU that passes the test, else CPU"], ["nvenc", "GPU — NVIDIA (NVENC)"],
+      isWin ? ["amf", "GPU — AMD (AMF)"] : ["vaapi", "GPU — Intel/AMD (VAAPI)"], ["qsv", "GPU — Intel (Quick Sync)"]];
+    spf.encoder = h("select", {}, ...encOpts.map(([v, t]) => h("option", { value: v }, t))); spf.encoder.value = spd.encoder || "cpu";
+    const gpuOut = h("div");
+    const detect = () => act(null, async () => {
+      gpuOut.replaceChildren(h("p", { class: "muted" }, "Testing the CPU and every GPU encoder with a short real encode… (up to a minute)"));
+      const r = await api("POST", "/api/gpu/detect", { width: +spf.width.value, height: +spf.height.value, fps: +spf.fps.value, video_kbps: +spf.video_kbps.value, ffmpeg_binary: (sp && sp.ffmpeg_binary) || "" });
+      const rep = r.report, rows = [];
+      if (!rep.ffmpeg_found) { gpuOut.replaceChildren(h("div", { class: "fix" }, "✘ ffmpeg ('" + rep.ffmpeg + "') could not be run — install ffmpeg first.")); return; }
+      rows.push(h("div", { class: "muted" }, rep.hardware.length ? "Hardware found: " + rep.hardware.join(" · ") : "No GPU found on this machine."));
+      for (const n of rep.notes) rows.push(h("div", { class: "fix" }, "ℹ " + n));
+      for (const t of rep.tests) rows.push(h("div", { style: "margin:6px 0" }, h("span", { class: "pill " + (t.ok ? "ok" : t.available ? "bad" : "warn") }, (t.ok ? "✔ " : t.available ? "✘ " : "– ") + t.label), " ", h("span", { class: "muted" }, t.detail), t.fix ? h("div", { class: "fix" }, "→ " + t.fix) : null));
+      const rec = rep.recommended;
+      rows.push(h("div", { style: "margin-top:8px" }, h("b", {}, "Recommended: " + (rep.tests.find(t => t.encoder === rec) || {}).label + " "),
+        h("button", { class: "b sec", onclick: () => { spf.encoder.value = rec; toast("Encoder set — remember to Save", "ok"); } }, "Use this")));
+      rows.push(h("p", { class: "muted", style: "font-size:.85em" }, rep.rendering));
+      gpuOut.replaceChildren(...rows.filter(Boolean));
+    });
+    spBox.append(h("div", { class: "row" }, field("UrT client program", withBrowse(spf.client_binary, () => browseDialog({ title: "Choose the Urban Terror client program (Quake3-UrT…)", kind: "file", source: () => ({ local: true }), start: dirnameOf(spf.client_binary.value) || spf.base_path.value.trim(), match: MATCH_EXE,
+        onPick: p => { spf.client_binary.value = p; if (!spf.base_path.value.trim()) { spf.base_path.value = dirnameOf(p); toast("UrT folder filled in from the program’s location", "ok"); } } })), "The game must be installed on this machine"),
+      field("UrT folder (base_path)", withBrowse(spf.base_path, () => browseDialog({ title: "Choose the folder that contains q3ut4/", kind: "dir", source: () => ({ local: true }), start: spf.base_path.value.trim() || dirnameOf(spf.client_binary.value), onPick: p => { spf.base_path.value = p; } })), "The folder that holds the q3ut4 folder with the .pk3 files")),
+      h("div", { class: "row" }, field("Output", spf.output, "hls = built-in web player; rtmp = Twitch/YouTube"), field("RTMP URL", spf.rtmp_url)),
+      h("div", { class: "row" }, field("Player port for this server", spf.web_port, "0 = use the shared web player port. Give each server its own (for example 8081, 8082) to stream on a different port; open each one in your firewall. It opens when this server's video starts and closes when it stops. Needs the web player (Settings)."), field("Player address for this server", spf.public_url, "Only if viewers reach this server's player at an address other than your public URL with this port (for example behind a reverse proxy). Leave empty otherwise.")),
+      h("div", { class: "row" }, field("Width", spf.width), field("Height", spf.height), field("FPS", spf.fps), field("Video kbps", spf.video_kbps), field("Spectator name", spf.client_name)),
+      h("div", { class: "row" }, field("Video processing", spf.encoder, "Choose where the video is encoded. 'Detect' proves the GPU really works before you rely on it.")),
+      h("div", { class: "acts" }, h("button", { class: "b sec", onclick: e => act(e.target, detect) }, "Detect GPU & test encoders")), gpuOut, spf.director, spf.hide_chat, spf.force_spectator, h("div", { class: "row" }, field("Spectate keys", spf.spectate_key, "Pressed in the game, one second apart, once the bot has joined and after every map load. Escape clears the join-team menu, 4 is its spectate entry. If a server shows NO team menu, use just 4 (Escape would open the in-game menu). Leave empty to turn off."), field("Send Escape after (seconds)", spf.escape_delay, "Escape is pressed this long after joining / each map load; the other keys go right away. 0 = together with the others.")));
+  };
+  wantVideo.addEventListener("change", drawVideo); drawVideo();
+  const results = h("div");
+  const collect = () => {
+    const o = Object.assign({}, s, { name: name.value.trim(), host: host.value.trim(), port: +port.value, rcon_password: rcon.value, archive_dir: arch.value.trim(), levelshot_dir: lvdir.value.trim(), poll_interval: +poll.value,
+      relay_chat: relay.querySelector("input").checked, rcon_commands: rcmd.querySelector("input").checked && rcon.value.trim() !== "", show_joins: joins.querySelector("input").checked });
+    const sfn = fsSel.value === NEW ? ssh.f.name.value.trim() : fsSel.value;
+    o.log_path = modeSel.value === "local" ? lp.value.trim() : modeSel.value === "sftp" ? sfn + ":" + rp.value.trim() : "";
+    if (wantVideo.querySelector("input").checked) {
+      o.spectator = Object.assign({}, sp || {}, { client_binary: spf.client_binary.value.trim(), base_path: spf.base_path.value.trim(), output: spf.output.value, rtmp_url: spf.rtmp_url.value, width: +spf.width.value, height: +spf.height.value,
+        fps: +spf.fps.value, video_kbps: +spf.video_kbps.value, client_name: spf.client_name.value, encoder: spf.encoder.value, director: spf.director.querySelector("input").checked, hide_chat: spf.hide_chat.querySelector("input").checked, force_spectator: spf.force_spectator.querySelector("input").checked, spectate_key: spf.spectate_key.value.trim(), escape_delay: +spf.escape_delay.value, web_port: Math.max(0, Math.min(65535, +spf.web_port.value || 0)), public_url: spf.public_url.value.trim() });
+      if (!sp) o.spectator.work_dir = "./stream";
+    } else o.spectator = null;
+    return o;
+  };
+  return h("div", { class: "card" }, h("h2", {}, ed.isNew ? "Add a game server" : "Edit " + ed.key),
+    h("div", { class: "row" }, field("Key", key, "A short id used in /gtv start"), field("Display name", name)),
+    h("div", { class: "row" }, field("Host", host), field("Game port (UDP)", port)),
+    h("h3", {}, "Live kill feed (games.log)"), field("Where is games.log?", modeSel), logBox,
+    h("details", {}, h("summary", {}, "More options"), h("div", { class: "row" }, field("rcon password", rcon), field("Poll interval (s)", poll), field("Match summaries folder", arch)), h("div", { class: "row" }, field("Map pictures folder", withBrowse(lvdir, () => { const bp = spf.base_path ? spf.base_path.value.trim() : ""; browseDialog({ title: "Choose the folder with the map pictures (<map>.jpg files or .pk3 files)", kind: "dir", source: () => ({ local: true }), start: lvdir.value.trim() || (bp ? bp.replace(/[\\/]+$/, "") + sepOf(bp) + "q3ut4" : ""), hint: picHint, onPick: p => { lvdir.value = p; } }); }), "Optional. Browse to the folder with the maps' .pk3 files (usually the q3ut4 folder of Urban Terror) or with <map>.jpg files. Empty = the UrT folder of this server's video. The bot must be running on the machine that holds the folder.")), relay, rcmd, joins),
+    h("h3", {}, "Spectator video"), wantVideo, spBox,
+    h("div", { class: "acts", style: "margin-top:14px" },
+      h("button", { class: "b sec", onclick: e => act(e.target, async () => { const r = await api("POST", "/api/servers/" + (key.value || "x") + "/test", collect()); renderChecks(results, r); }) }, "Test connection"),
+      h("button", { class: "b", onclick: e => act(e.target, async () => {
+        const k = key.value.trim(); if (!k) throw new Error("Give the server a key.");
+        if (modeSel.value === "sftp" && fsSel.value === NEW) {
+          const n = ssh.f.name.value.trim(); if (!n) throw new Error("Give the new SSH connection a name.");
+          if (!ssh.f.host.value.trim() || !ssh.f.user.value.trim()) throw new Error("The new SSH connection needs a host and a user.");
+          await api("PUT", "/api/filesystems/" + n, ssh.body());
+        }
+        const r = await api("PUT", "/api/servers/" + k, collect()); await refresh(); S.edit = null; toast("Saved" + (r.problems.length ? " (with warnings: " + r.problems[0] + ")" : ""), "ok"); renderTab();
+      }) }, "Save"),
+      h("button", { class: "b sec", onclick: () => { S.edit = null; renderTab(); } }, "Cancel")), results);
+}
+function sftpCard() {
+  const cfg = S.config, list = Object.entries(cfg.filesystems);
+  const f = { name: text("", { placeholder: "e.g. gameserver" }), host: text(""), port: num(22), user: text(""), password: text("", { type: "password", placeholder: "or use a key file" }), key_file: text("", { placeholder: "~/.ssh/id_ed25519" }) };
+  const out = h("div");
+  const body = () => ({ type: "sftp", host: f.host.value.trim(), port: +f.port.value, user: f.user.value.trim(), password: f.password.value, key_file: f.key_file.value.trim(), known_hosts: "", password_env: "", trust_unknown_hosts: false });
+  const test = async (learn) => {
+    const r = await api("POST", "/api/test/filesystem", Object.assign(body(), { learn_host_key: learn || false, path: "/" }));
+    out.replaceChildren(r.connected ? h("div", { class: "pill ok" }, "✔ " + r.label + " — " + r.detail) : h("div", {}, h("div", { class: "fix" }, "✘ " + r.error),
+      r.needs_host_key_approval ? h("button", { class: "b sec", onclick: e => { if (confirm("Only continue if the fingerprint above matches your game server.\nTrust this host key and remember it?")) act(e.target, () => test(true)); } }, "Trust this host key and retry") : null));
+  };
+  return h("div", { class: "card" }, h("h2", {}, "Game server on another machine? (SFTP connections)"),
+    h("p", { class: "muted" }, "The bot reads games.log over SSH/SFTP. Add the login here, then choose it when adding a server."),
+    list.length ? h("table", {}, ...list.map(([n, x]) => h("tr", {}, h("td", { class: "mono" }, n), h("td", { class: "mono" }, x.user + "@" + x.host + ":" + x.port), h("td", {}, h("button", { class: "b red", onclick: e => act(e.target, async () => { await api("DELETE", "/api/filesystems/" + n); await refresh(); renderTab(); }) }, "Remove"))))) : null,
+    h("h3", {}, "Add a connection"), h("div", { class: "row" }, field("Name", f.name), field("Host", f.host), field("Port", f.port), field("User", f.user)),
+    h("div", { class: "row" }, field("Password", f.password), field("or private key file (on this machine)", f.key_file)),
+    h("div", { class: "acts" }, h("button", { class: "b sec", onclick: e => act(e.target, () => test(false)) }, "Test"),
+      h("button", { class: "b", onclick: e => act(e.target, async () => { if (!f.name.value.trim()) throw new Error("Give the connection a name."); await api("PUT", "/api/filesystems/" + f.name.value.trim(), body()); await refresh(); toast("Saved", "ok"); renderTab(); }) }, "Save")), out);
+}
+
+// ---------------------------------------------------------------- video
+function viewVideo(m) {
+  const withVideo = Object.entries(S.config.servers).filter(([, s]) => s.spectator);
+  m.append(h("div", { class: "card" }, h("h2", {}, "Video check"), h("p", { class: "muted" }, "Walks the video pipeline stage by stage (UrT client and its libraries, Xvfb, ffmpeg, the HLS output, the web player) and points at the first thing that is wrong. Video only runs while a broadcast was started with video on.")));
+  if (!withVideo.length) return m.append(h("div", { class: "card" }, h("p", { class: "muted" }, "No server has video enabled. Edit a server on the Servers tab and tick “Enable spectator video”.")));
+  for (const [k] of withVideo) { const box = h("div"); m.append(h("div", { class: "card" }, h("h2", {}, k), h("button", { class: "b", onclick: e => act(e.target, async () => renderChecks(box, await api("POST", "/api/servers/" + k + "/test-stream", {}))) }, "Run video check"), box)); }
+}
+
+// ---------------------------------------------------------------- settings
+/** Who may run the /gtv rcon commands (cyclemap, slap, kick, bigtext, ban): one or more Discord roles AND/OR chosen people. */
+function rconCard() {
+  const cfg = S.config, ids = text((cfg.discord.rcon_roles || []).join(", "), { placeholder: "role id(s), comma separated — or tick roles below" }), list = h("div");
+  const cur = () => ids.value.split(",").map(x => x.trim()).filter(Boolean);
+  const load = async () => {
+    list.replaceChildren(h("span", { class: "muted" }, "Loading…"));
+    let r; try { r = await api("GET", "/api/discord/roles"); } catch (e) { list.replaceChildren(h("div", { class: "fix" }, "✘ " + e.message)); return; }
+    list.replaceChildren(...(r.guilds.length ? r.guilds.map(g => h("div", { style: "margin:10px 0" }, h("b", {}, g.name), ...g.roles.map(ro => {
+      const cb = h("input", { type: "checkbox" }); cb.checked = cur().includes(ro.id);
+      cb.addEventListener("change", () => { const set = new Set(cur()); if (cb.checked) set.add(ro.id); else set.delete(ro.id); ids.value = [...set].join(", "); });
+      return h("label", { style: "display:flex;align-items:center;font-size:14px;color:var(--text);margin:3px 0" }, cb, ro.name, h("span", { class: "muted mono", style: "margin-left:8px" }, ro.id));
+    }))) : [h("div", { class: "muted" }, "The bot is not in any Discord server yet.")]));
+  };
+
+  // ---- people: chosen one by one (by user id, or found by name), each shown with the name Discord knows them by
+  let users = (cfg.discord.rcon_users || []).map(String);
+  const names = {}, chips = h("div", { style: "display:flex;flex-wrap:wrap;gap:6px;margin:8px 0" }), msg = h("div", { class: "muted" }), results = h("div");
+  const uid = text("", { placeholder: "Discord user id, e.g. 123456789012345678" }), q = text("", { placeholder: "part of a name" });
+  const say = (t, bad) => { msg.className = bad ? "fix" : "muted"; msg.textContent = t; };
+  const drawChips = () => {
+    chips.replaceChildren(...(users.length ? users.map(id => h("span", { class: "pill ok", style: "display:inline-flex;align-items:center;gap:6px" },
+      names[id] || id, names[id] ? h("span", { class: "mono", style: "opacity:.6;font-size:12px" }, id) : "",
+      h("button", { class: "b sec", style: "padding:0 6px;min-height:0", title: "Remove", onclick: () => { users = users.filter(x => x !== id); drawChips(); } }, "✕"))) : [h("span", { class: "muted" }, "nobody chosen yet")]));
+    for (const id of users) if (!(id in names)) { names[id] = ""; api("GET", "/api/discord/user?id=" + encodeURIComponent(id)).then(r => { names[id] = r.display || r.name; drawChips(); }).catch(() => {}); }
+  };
+  const add = (id, name) => { id = String(id).trim(); if (!/^[0-9]{15,25}$/.test(id)) { say("That is not a Discord user id (a long number).", true); return false; } if (!users.includes(id)) users.push(id); if (name) names[id] = name; say(""); drawChips(); return true; };
+  const addById = async () => {
+    const id = uid.value.trim(); if (!id) return;
+    if (!/^[0-9]{15,25}$/.test(id)) return say("That is not a Discord user id (a long number): in Discord with Developer Mode on, right-click the person → Copy User ID.", true);
+    try { const r = await api("GET", "/api/discord/user?id=" + encodeURIComponent(id)); if (add(r.id, r.display || r.name)) uid.value = ""; }
+    catch (e) { if (/can still be added/.test(e.message)) { if (add(id, "")) { uid.value = ""; say(e.message); } } else say(e.message, true); }
+  };
+  const search = async () => {
+    const t = q.value.trim(); if (!t) return;
+    results.replaceChildren(h("span", { class: "muted" }, "Searching…"));
+    let r; try { r = await api("GET", "/api/discord/members?q=" + encodeURIComponent(t)); } catch (e) { results.replaceChildren(h("div", { class: "fix" }, "✘ " + e.message)); return; }
+    results.replaceChildren(...(r.people.length ? r.people.map(p => h("div", { style: "display:flex;align-items:center;gap:8px;margin:4px 0" },
+      h("button", { class: "b sec", onclick: () => add(p.id, p.display || p.name) }, "Add"), h("span", {}, p.display || p.name), h("span", { class: "muted mono" }, "@" + p.name), h("span", { class: "muted" }, "· " + p.guild))) : [h("div", { class: "muted" }, "Nobody found with that name.")]));
+  };
+  drawChips();
+
+  const servers = Object.entries(cfg.servers || {}), on = servers.filter(([, s]) => s.rcon_commands && s.rcon_password);
+  return h("div", { class: "card" }, h("h2", {}, "Rcon commands from Discord"),
+    h("p", { class: "muted" }, "People you choose, and/or members of a role you choose, can type ", h("span", { class: "mono" }, "/gtv rcon cyclemap · slap · kick · bigtext · ban"), " in Discord. Nothing else can be sent to the game server, and the answers are only shown to the person who ran the command. A ban needs a reason; it bans the player's address and kicks them. Either one is enough: being chosen below, or holding a chosen role."),
+    h("div", { class: "warnbox" }, "Everyone chosen here can kick and ban players. Keep the list small. Manage Server alone is not enough, and the “@everyone” role is refused."),
+    h("h3", { style: "margin:14px 0 4px" }, "People"),
+    chips,
+    h("div", { class: "row" }, field("Add by Discord user id", uid, "Discord with Developer Mode on: right-click the person → Copy User ID. The name is looked up so you can see it is the right one."),
+      field("…or search by name", q, "Needs the bot's “Server Members Intent” switched on in the Discord Developer Portal.")),
+    h("div", { class: "acts" }, h("button", { class: "b sec", onclick: e => act(e.target, addById) }, "Add this id"), h("button", { class: "b sec", onclick: e => act(e.target, search) }, "Search members")),
+    msg, results,
+    h("h3", { style: "margin:14px 0 4px" }, "Role (optional)"),
+    field("Server-admin role id(s)", ids, "Everyone with this role may use it. In Discord with Developer Mode on: right-click the role → Copy Role ID. Or press “Load roles” and tick the role. Leave empty to use only the people above."),
+    h("div", { class: "acts" }, h("button", { class: "b sec", onclick: e => act(e.target, load) }, "Load roles from Discord"), h("button", { class: "b", onclick: e => act(e.target, async () => {
+      const c = JSON.parse(JSON.stringify(S.config)); c.discord.rcon_roles = cur(); c.discord.rcon_users = users.slice();
+      await api("PUT", "/api/config", { config: c }); await refresh(); renderHeader(); toast(cur().length || users.length ? "Saved" : "Saved — nobody is chosen, so /gtv rcon is off", "ok"); renderTab();
+    }) }, "Save")), list,
+    h("div", { style: "margin-top:12px" }, h("b", {}, "Servers: "), on.length ? on.map(([k]) => h("span", { class: "pill ok", style: "margin-right:6px" }, k)) : h("span", { class: "muted" }, "none yet — switch it on per server: Servers → edit → More options (needs the rcon password).")));
+}
+function viewSettings(m) {
+  const cfg = S.config, web = cfg.web || { host: "0.0.0.0", port: 8080, public_url: "", token: "" };
+  const wh = text(web.host), wp = num(web.port), wu = text(web.public_url, { placeholder: "http://your-address:8080" }), wt = text(web.token, { type: "password" }), on = check(!!cfg.web, "Run the video web player");
+  const restrict = text((cfg.discord.restrict_to_user_ids || []).join(", "), { placeholder: "empty = anyone with Manage Server" });
+  m.append(h("div", { class: "card" }, h("h2", {}, "Discord access"), field("Only these Discord user IDs may control broadcasts", restrict, "Comma separated. Leave empty to allow everyone with the Manage Server permission."),
+    h("h2", { style: "margin-top:16px" }, "Video web player"), on, h("div", { class: "row" }, field("Listen address", wh), field("Port", wp), field("Public URL", wu), field("Access token", wt, "Viewers get it through the Discord button")),
+    h("div", { class: "acts" }, h("button", { class: "b", onclick: e => act(e.target, async () => {
+      const c = JSON.parse(JSON.stringify(S.config));
+      c.discord.restrict_to_user_ids = restrict.value.split(",").map(x => x.trim()).filter(Boolean);
+      c.web = on.querySelector("input").checked ? { host: wh.value.trim(), port: +wp.value, public_url: wu.value.trim(), token: wt.value } : null;
+      const r = await api("PUT", "/api/config", { config: c }); await refresh(); renderHeader(); toast(r.needs_restart ? "Saved — restart the bot to apply the port/token change" : "Saved", "ok");
+    }) }, "Save"), h("button", { class: "b sec", onclick: () => { wt.type = "text"; wt.value = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, "0")).join(""); } }, "New token"))));
+  m.append(rconCard());
+  m.append(accessCard());
+  const cur = h("input", { type: "password" }), nw = h("input", { type: "password" });
+  m.append(h("div", { class: "card" }, h("h2", {}, "Admin password"), h("div", { class: "row" }, field("Current", cur), field("New (8+ characters; " + S.state.access.min_password + "+ while remote access is on)", nw)),
+    h("button", { class: "b", onclick: e => act(e.target, async () => { await api("POST", "/api/password", { current: cur.value, new: nw.value }); toast("Changed — please sign in again", "ok"); S.authed = false; render(); }) }, "Change password")));
+  const ta = h("textarea", { placeholder: "Paste the contents of config.json from the Python version" });
+  m.append(h("div", { class: "card" }, h("h2", {}, "Import a config from the Python version"), h("p", { class: "muted" }, "Brings over the Discord token, servers, SFTP connections and web settings. Existing entries with the same name are replaced."), ta,
+    h("button", { class: "b", onclick: e => act(e.target, async () => { const r = await api("POST", "/api/import", { text: ta.value }); await refresh(); toast("Imported " + r.imported_servers + " server(s)", "ok"); ta.value = ""; }) }, "Import")));
+  m.append(h("div", { class: "card" }, h("h2", {}, "About The Forge GTV"),
+    h("p", { class: "muted" }, "The Forge GTV is free software, released under the GNU General Public License, version 3 or later. You may use, study, share and change it; it comes with NO WARRANTY. Run “forge-gtv license” for the full notice, or read the LICENSE file in the source."),
+    h("p", { class: "muted" }, "It is an independent community project. It is not made, endorsed or supported by Frozen Sand / the Urban Terror developers or by Discord Inc.; those names are trademarks of their owners. Urban Terror itself is not included. Chat typed in the game is never posted to Discord and is hidden on the video unless you change that.")));
+  m.append(h("div", { class: "card" }, h("h2", {}, "This installation"), h("p", { class: "mono" }, "Config file: " + S.state.config_path), h("p", { class: "mono" }, S.state.os + " / " + S.state.arch + " · v" + S.state.version),
+    h("div", { class: "acts" }, h("button", { class: "b sec", onclick: e => act(e.target, async () => { await api("POST", "/api/discord/reconnect"); toast("Reconnecting…", "ok"); }) }, "Reconnect to Discord"),
+      h("button", { class: "b red", onclick: e => { if (confirm("Restart the bot now? Running broadcasts will be stopped.")) act(e.target, async () => { const r = await api("POST", "/api/restart"); toast(r.under_service ? "Restarting — reload this page in a few seconds" : "Restarting a new copy — reload in a few seconds", "ok"); }); } }, "Restart the bot"))));
+}
+
+// ---------------------------------------------------------------- branding
+const picSrc = v => !v ? "" : /^https?:\/\//i.test(v) ? v : "/api/picture/" + encodeURIComponent(v);
+async function uploadPicture(slot, file) {
+  const r = await fetch("/api/branding/" + slot, { method: "PUT", headers: { "X-Requested-With": "gtv-admin" }, body: file, credentials: "same-origin" });
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (!r.ok || j.ok === false) throw new Error(j.error || (r.status === 413 ? "That picture is too big (2 MB at most)." : "HTTP " + r.status));
+  return j;
+}
+function viewBranding(m) {
+  const st = S.state, b = st.branding, cfg = S.config;
+  let logo = b.logo, icon = b.icon;
+  const name = text(b.name, { maxlength: 40, placeholder: "e.g. The Forge" });
+  const color = text(b.color, { placeholder: "#E67E22 (optional)" });
+  const picker = h("input", { type: "color", value: /^#[0-9a-f]{6}$/i.test(b.color) ? b.color : "#5865f2", style: "flex:none;width:48px;padding:0;height:34px" });
+  const prev = h("div", { class: "embedprev" });
+  const logoUrl = text(/^https?:/i.test(logo) ? logo : "", { placeholder: "…or paste an https:// address" });
+  const iconUrl = text(/^https?:/i.test(icon) ? icon : "", { placeholder: "…or paste an https:// address" });
+  const logoBox = h("div", { class: "picrow" }), iconBox = h("div", { class: "picrow" });
+  const cur = (url, file) => url.value.trim() || file;
+  const draw = () => {
+    const l = picSrc(cur(logoUrl, logo)), i = picSrc(cur(iconUrl, icon)), nm = name.value.trim();
+    const c = /^#?[0-9a-f]{6}$/i.test(color.value.trim()) ? "#" + color.value.trim().replace("#", "") : "#5865f2";
+    prev.style.borderLeftColor = c;
+    prev.replaceChildren(
+      nm ? h("div", { class: "au" }, i ? h("img", { src: i, alt: "" }) : null, nm) : h("div", { class: "au muted" }, "(no clan name set)"),
+      l ? h("div", { class: "th" }, h("img", { src: l, alt: "" })) : null,
+      h("div", { class: "ti" }, "📡 LIVE · Your server name"), h("div", { class: "ds" }, "🗺️ ut4_turnpike · CTF · 👥 9/16\n👁 3 watching the stream"),
+      h("div", { class: "ft" }, "The Forge GTV v" + st.version + " · owner " + st.owner));
+    prev.querySelector(".ds").style.whiteSpace = "pre-line";
+    for (const [box, v, url, slot] of [[logoBox, cur(logoUrl, logo), logoUrl, "logo"], [iconBox, cur(iconUrl, icon), iconUrl, "icon"]]) {
+      const file = h("input", { type: "file", accept: "image/png,image/jpeg,image/gif,image/webp", style: "max-width:230px" });
+      file.addEventListener("change", () => file.files[0] && act(null, async () => {
+        const r = await uploadPicture(slot, file.files[0]);
+        if (slot === "logo") { logo = r.file; logoUrl.value = ""; } else { icon = r.file; iconUrl.value = ""; }
+        await refresh(); toast("Picture saved", "ok"); draw();
+      }));
+      box.replaceChildren(v ? h("img", { src: picSrc(v), alt: "" }) : h("span", { class: "muted" }, "none"), file,
+        v ? h("button", { class: "b sec", onclick: () => { if (slot === "logo") { logo = ""; logoUrl.value = ""; } else { icon = ""; iconUrl.value = ""; } draw(); } }, "Remove") : null);
+    }
+  };
+  for (const e of [name, color, logoUrl, iconUrl]) e.addEventListener("input", draw);
+  picker.addEventListener("input", () => { color.value = picker.value.toUpperCase(); draw(); });
+  draw();
+  const needPublic = !b.public_address_set;
+  m.append(h("div", { class: "card" }, h("h2", {}, "Clan branding"),
+    h("p", { class: "muted" }, "Make the posts look like your clan's: the name above the title, a logo in the corner, a small icon next to the name, and an accent colour. Changes show up in Discord within a few seconds - no restart."),
+    h("div", { class: "row" }, field("Clan / community name", name, "Up to 40 characters. Shown above every post and on the video page."),
+      field("Accent colour", h("div", { class: "pick" }, color, picker), "Used for the live feed, summaries and player cards. The live scoreboard keeps red/blue so you can see which team leads.")),
+    h("div", { class: "row" },
+      field("Logo (corner of each post, top of the video page)", h("div", {}, logoBox, logoUrl), "PNG, JPEG, GIF or WebP, up to 2 MB. Square or wide both work."),
+      field("Icon (small, next to the name; the video page's tab icon)", h("div", {}, iconBox, iconUrl), "A small square picture works best.")),
+    needPublic ? h("div", { class: "warnbox" }, "Discord has to fetch your pictures from the internet. Pictures you upload here are served by the video web player, so set the ", h("b", {}, "Public URL"), " on the Settings tab (an address people outside your network can reach) - or paste an https:// address of a picture that is already online. Until then Discord shows the clan name and colour but no pictures.") : null,
+    h("h3", {}, "Preview (roughly how it looks in Discord)"), prev,
+    h("div", { class: "hint", style: "margin:8px 0 12px" }, "The line at the bottom - “The Forge GTV v" + st.version + " · owner " + st.owner + "” - is on every post and cannot be changed or removed: it credits the owner of The Forge GTV. The bot's own name and profile picture in Discord are set in the Discord Developer Portal (Applications → your bot)."),
+    h("button", { class: "b", onclick: e => act(e.target, async () => {
+      await api("PUT", "/api/branding", { name: name.value, color: color.value, logo: cur(logoUrl, logo), icon: cur(iconUrl, icon) });
+      await refresh(); toast("Branding saved", "ok"); renderTab();
+    }) }, "Save branding")));
+  const each = check(cfg.discord.new_post_each_map, "Start a new post for every map"), del = check(cfg.discord.delete_old_posts, "Remove the previous map's posts instead of keeping them");
+  m.append(h("div", { class: "card" }, h("h2", {}, "Posts in the channel"),
+    h("p", { class: "muted" }, "When the map changes, the bot closes the old scoreboard (marked “FINISHED”, with its final standings, and the live feed with the map's last events), and posts a new scoreboard, feed and Watch button at the bottom of the channel. The “Match finished” summary stays in the channel. This keeps the channel tidy: the live post is always the newest one."),
+    each, del, h("div", { class: "hint" }, "With “remove”, the bot needs the Manage Messages permission in the channel. Turn the first option off to keep one post for the whole broadcast."),
+    h("div", { style: "margin-top:10px" }, h("button", { class: "b", onclick: e => act(e.target, async () => {
+      const c = JSON.parse(JSON.stringify(S.config));
+      c.discord.new_post_each_map = each.querySelector("input").checked; c.discord.delete_old_posts = del.querySelector("input").checked;
+      await api("PUT", "/api/config", { config: c }); await refresh(); toast("Saved", "ok");
+    }) }, "Save"))));
+  m.append(levelCard());
+}
+
+// Map pictures: the level picture of the map being played, on every scoreboard, always the same square size.
+function levelCard() {
+  const cfg = S.config, lv = cfg.levelshots || { enabled: true, size: 320, fit: "crop" }, b = S.state.branding, L = b.levelshots || { min: 128, max: 640 };
+  const on = check(lv.enabled, "Show the picture of the current map on the scoreboard");
+  const size = num(lv.size, { min: L.min, max: L.max, step: 16 });
+  const fit = h("select", {}, h("option", { value: "crop" }, "Fill the square (cut the edges of a wide picture)"), h("option", { value: "pad" }, "Keep the whole picture (dark bars above and below)"));
+  fit.value = lv.fit === "pad" ? "pad" : "crop";
+  const keys = Object.keys(cfg.servers);
+  const sel = h("select", {}, ...keys.map(k => h("option", { value: k }, k + " — " + (cfg.servers[k].name || k))));
+  const map = text("ut4_turnpike", { placeholder: "map name, e.g. ut4_turnpike" }), out = h("div");
+  const find = () => act(null, async () => {
+    out.replaceChildren(h("p", { class: "muted" }, "Looking…"));
+    const r = await api("GET", "/api/levelshot-find?server=" + encodeURIComponent(sel.value) + "&map=" + encodeURIComponent(map.value.trim()));
+    const where = h("div", { class: "hint" }, "Searched: " + (r.searched.length ? r.searched.join(" · ") : "nowhere (no folder is set for this server)"));
+    if (!r.found) { out.replaceChildren(h("div", { class: "fix" }, "✘ " + r.message), where); return; }
+    out.replaceChildren(h("div", { style: "margin:6px 0" }, h("img", { src: r.preview, style: "width:" + r.size + "px;height:" + r.size + "px;max-width:100%;border-radius:6px;display:block" })),
+      h("div", {}, h("span", { class: "pill ok" }, "✔ found"), " ", h("span", { class: "muted" }, r.size + " × " + r.size + " px, saved as " + r.file)),
+      r.shown_in_discord ? null : h("div", { class: "fix" }, "→ Discord will not show it until pictures are on and the Public URL is set (Settings)."), where);
+  });
+  const card = h("div", { class: "card" }, h("h2", {}, "Map pictures"),
+    h("p", { class: "muted" }, "The scoreboard shows the level picture of the map being played, resized to one fixed square so every post looks the same however the map's own picture was made (and a channel with several broadcasts stays tidy). The bot reads it from the game files: the server's “UrT folder” of the spectator video, or a folder you give under Servers → edit → More options. It is shown a few seconds after a map starts, and nothing is shown for a map it has no picture for."),
+    !b.public_address_set ? h("div", { class: "warnbox" }, "Discord fetches the picture from your web player, so the ", h("b", {}, "Public URL"), " (Settings tab) must be set.") : null,
+    on, h("div", { class: "row" }, field("Size (pixels, width and height)", size, "128 – 640. 320 is a good size for a channel with several broadcasts; Discord may show it a little smaller."), field("Not a square picture?", fit)),
+    h("button", { class: "b", onclick: e => act(e.target, async () => {
+      const c = JSON.parse(JSON.stringify(S.config));
+      c.levelshots = { enabled: on.querySelector("input").checked, size: Math.max(L.min, Math.min(L.max, +size.value || 320)), fit: fit.value };
+      await api("PUT", "/api/config", { config: c }); await refresh(); toast("Saved", "ok"); renderTab();
+    }) }, "Save"),
+    keys.length ? h("div", { style: "margin-top:16px" }, h("h3", {}, "Test: does the bot find a picture?"), h("div", { class: "row" }, field("Server", sel), field("Map", map)),
+      h("button", { class: "b sec", onclick: e => act(e.target, find) }, "Find the picture"), out) : null);
+  return card;
+}
+
+// ---------------------------------------------------------------- who can open the panel
+function accessCard() {
+  const a = S.state.access;
+  const cur = h("input", { type: "password", autocomplete: "current-password" }), nw = h("input", { type: "password", autocomplete: "new-password" });
+  const ips = h("textarea", { style: "min-height:70px", placeholder: "one per line, e.g.\n203.0.113.7\n10.0.0.0/8" }, (a.allowed_ips || []).join("\n"));
+  const list = () => ips.value.split(/[\n,;\s]+/).map(x => x.trim()).filter(Boolean);
+  const ack = h("input", { type: "checkbox" });
+  const send = async (remote, extra) => {
+    const r = await api("POST", "/api/access", Object.assign({ remote, password: cur.value }, extra || {}));
+    cur.value = ""; nw.value = ""; await refresh(); renderHeader(); renderTab();
+    toast(r.needs_restart ? "Saved - restart the bot to apply (Settings → Restart the bot)" : "Saved", "ok");
+  };
+  const card = h("div", { class: "card" }, h("h2", {}, "Who can open this panel"),
+    h("span", { class: "pill " + (a.remote ? "warn" : "ok") }, a.remote ? "Open to other computers" : "This computer only"));
+  if (!a.remote) {
+    card.append(h("p", { class: "muted" }, "Right now the panel only answers on the computer the bot runs on (" + a.host + ":" + a.port + "). That is the safest setting: to reach it from your own PC, use an SSH tunnel, or turn on remote access below."),
+      h("details", {}, h("summary", {}, "Let other computers open the panel…"),
+        h("div", { class: "warnbox" }, "The panel can read and change your bot token, server passwords and SFTP logins. Only turn this on if you need it, and then protect it: allow only your own address below, and use a VPN, an SSH tunnel or an HTTPS reverse proxy - the panel itself speaks plain HTTP, so on the open internet your password could be read. A firewall rule for port " + a.port + " is a good extra step."),
+        h("div", { class: "row" }, field("Your current password", cur), field("New password for remote access (" + a.min_password + "+ characters)", nw, "A long phrase of random words is best. Your old password stops working.")),
+        field("Only these addresses may open it (optional, but recommended)", ips, "A single address (203.0.113.7) or a range (10.0.0.0/8). This computer is always allowed. Leave empty to allow any address that knows the password."),
+        h("label", { style: "display:flex;align-items:center;margin-bottom:10px" }, ack, "I understand the panel uses plain HTTP and I will protect it (VPN, tunnel, proxy or firewall)."),
+        h("button", { class: "b", onclick: e => { if (!ack.checked) return toast("Tick the box to confirm.", "bad"); act(e.target, () => send(true, { new_password: nw.value, allowed_ips: list() })); } }, "Allow remote access")));
+  } else {
+    card.append(h("p", { class: "muted" }, "Other computers can open the panel at http://<this computer>:" + a.port + (a.allowed_ips.length ? ", but only from: " + a.allowed_ips.join(", ") + "." : ", from any address that knows the password.") + " It uses plain HTTP: keep it behind a VPN, an SSH tunnel or an HTTPS proxy."),
+      field("Only these addresses may open it", ips, "One per line. Empty = any address. This computer is always allowed. If you list addresses, include the one you are using now."),
+      h("div", { class: "row" }, field("Your current password", cur), field("New password (optional, " + a.min_password + "+ characters)", nw)),
+      h("div", { class: "acts" },
+        h("button", { class: "b", onclick: e => act(e.target, () => send(true, { new_password: nw.value, allowed_ips: list() })) }, "Save"),
+        h("button", { class: "b sec", onclick: e => { if (confirm("Close the panel to other computers? You will need to be on the bot's computer (or use an SSH tunnel) to open it.")) act(e.target, () => send(false)); } }, "Back to this computer only")));
+  }
+  card.append(h("div", { class: "hint", style: "margin-top:8px" }, "From the command line on the bot's computer: forge-gtv admin-access show | local | remote --allow <address>. Changing between local and remote takes effect after a restart; closing it to other computers is immediate."));
+  return card;
+}
+
+// ---------------------------------------------------------------- logs
+function viewLogs(m) {
+  const pre = h("pre", { class: "log" }); m.append(h("div", { class: "card" }, h("h2", {}, "Bot log (live)"), pre));
+  const load = async () => { try { const r = await api("GET", "/api/logs?n=400"); const atEnd = pre.scrollTop + pre.clientHeight >= pre.scrollHeight - 30; pre.textContent = r.lines.join("\n"); if (atEnd) pre.scrollTop = pre.scrollHeight; } catch (e) {} };
+  load().then(() => pre.scrollTop = pre.scrollHeight); S.logsTimer = setInterval(load, 3000);
+}
+boot();
+</script></body></html>

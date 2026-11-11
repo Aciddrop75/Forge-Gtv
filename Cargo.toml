@@ -1,0 +1,45 @@
+[package]
+name = "forge-gtv"
+version = "3.8.0"
+edition = "2024"
+description = "The Forge GTV - broadcast an Urban Terror server into Discord (live scoreboard, kill feed, optional spectator video)"
+license = "GPL-3.0-or-later"
+authors = ["[TFG]Aciddrop"]
+readme = "README.md"
+keywords = ["urban-terror", "discord", "bot", "quake3", "gtv"]
+categories = ["games", "command-line-utilities"]
+publish = false
+
+[dependencies]
+anyhow = "1.0.104"
+async-trait = "0.1.92"
+axum = "0.8.9"
+base64 = "0.23.1"
+chrono = { version = "0.4.45", default-features = false, features = ["clock"] }
+clap = { version = "4.6.7", features = ["derive"] }
+hex = "0.4.3"
+image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "tga"] }
+indexmap = { version = "2.14.2", features = ["serde"] }
+rand = "0.10.3"
+regex = "1.13.1"
+russh = { version = "0.65.0", default-features = false, features = ["flate2", "ring", "rsa"] }
+russh-sftp = "3.0.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+serenity = { version = "0.12.5", default-features = false, features = ["client", "gateway", "model", "rustls_backend", "builder", "http", "utils"] }
+sha2 = "0.11.1"
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "net", "time", "process", "sync", "fs", "signal", "io-util"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+zip = { version = "9.4.1", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4
+strip = true
+panic = "unwind"
+
+[dev-dependencies]
+http-body-util = "0.1.5"
+tower = { version = "0.5.3", features = ["util"] }

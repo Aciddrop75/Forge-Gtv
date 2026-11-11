@@ -1,0 +1,89 @@
+name: release
+# Compiles the source on GitHub's own Linux and Windows machines and publishes the installers as a Release.
+#
+# Two ways to start it (anyone with write access to the repository, including the owner of a fork):
+#   1. Push a tag that starts with "v" (for example  git tag v3.8.0 && git push origin v3.8.0 ).
+#   2. Actions tab -> "release" -> "Run workflow": type a tag such as v3.8.0 to build AND publish a Release, or leave the box
+#      empty to only build (the files then appear as downloads at the bottom of the run, nothing is published).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create, e.g. v3.8.0 (leave empty to only build the files, without a release)"
+        required: false
+        default: ""
+
+# A repository created under a personal account gives workflows a read-only token by default, which cannot create the
+# release that the installers are attached to - so this says so explicitly.
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            name: linux-x86_64
+            ext: ""
+          - os: windows-latest
+            name: windows-x86_64
+            ext: ".exe"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # Build first, so a failing test can never stop the installer from being produced.
+      - name: Build
+        run: cargo build --release
+      # Linux tests must pass. The Windows code has never been run on a real Windows machine, so a Windows test
+      # failure is reported (look for the orange warning on the run) but does not stop the .exe being uploaded.
+      - name: Tests
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
+        run: cargo test --release
+      - name: Package
+        shell: bash
+        run: |
+          VERSION=$(grep -m1 '^version' Cargo.toml | sed 's/.*"\(.*\)"/\1/')
+          mkdir -p dist
+          OUT="dist/forge-gtv-setup-${VERSION}-${{ matrix.name }}${{ matrix.ext }}"
+          cp "target/release/forge-gtv${{ matrix.ext }}" "$OUT"
+          (cd dist && sha256sum "$(basename "$OUT")" > "SHA256SUMS-${{ matrix.name }}.txt")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: forge-gtv-${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+
+  # One job creates the Release from both builds, so the two platforms never race to create it twice.
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.tag != ''
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: forge-gtv-*
+          path: dist
+          merge-multiple: true
+      - name: Add the licence files
+        run: cp LICENSE THIRD-PARTY-NOTICES.md dist/
+      - name: Create the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          name: The Forge GTV ${{ github.event.inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          files: dist/*
+          body: |
+            Installers built from the source in this repository by GitHub Actions.
+
+            **The Windows installer has never been tested on a real Windows machine.** The Linux installer is built on
+            Ubuntu 22.04 and needs glibc 2.35 or newer. See `CHANGELOG.md` for what changed and `README.md` for the full list of
+            what was and was not tested. Check a download against the matching `SHA256SUMS-...txt` file.

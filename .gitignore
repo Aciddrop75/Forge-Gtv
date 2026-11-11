@@ -1,0 +1,7 @@
+/target
+/dist
+*.log
+secrets.env
+/config.json
+.DS_Store
+*.swp
