@@ -1,0 +1,17 @@
+# Dependency advisories that `cargo audit` (and the CI "audit" job) should not fail on, each with the reason.
+# Re-check every entry whenever serenity is updated: the goal is for this list to be empty.
+[advisories]
+ignore = [
+    # rustls 0.22 / rustls-webpki 0.102 come only from serenity 0.12.5 (the newest release) through
+    # tokio-tungstenite 0.21, and are used only for the bot's own connection to Discord's gateway
+    # (wss://gateway.discord.gg, a public certificate, no client certificates, no CRLs, no name constraints).
+    # Everything else in the bot (Discord's HTTP API, web requests) uses the patched rustls 0.23.
+    # Remove these as soon as a serenity release moves to tungstenite >= 0.24 / rustls >= 0.23.46.
+    "RUSTSEC-2026-0346", # rustls: ServerHello can downgrade later connections to classical key exchange
+    "RUSTSEC-2026-0349", # rustls: Debug impls expose session secrets (the bot never prints TLS sessions)
+    "RUSTSEC-2026-0049", # rustls-webpki: CRL distribution point matching (no CRLs are used)
+    "RUSTSEC-2026-0098", # rustls-webpki: URI name constraints
+    "RUSTSEC-2026-0099", # rustls-webpki: wildcard name constraints
+    "RUSTSEC-2026-0104", # rustls-webpki: panic while parsing a CRL (no CRLs are parsed)
+    "RUSTSEC-2026-0382", # rustls-webpki: distrusted intermediates may be accepted
+]
